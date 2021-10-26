@@ -51,18 +51,30 @@ const Login: React.FC = () => {
         <IonText> Email</IonText>
         <IonInput
           placeholder="Email"
-          {...register("email", { required: true })}
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^\S+@\S+$/i,
+              message: "This is not a valid email",
+            },
+          })}
           // onIonChange={(e: any) => setEmail(e.target.value)}
         />
-        {errors.email && <p>Email is required</p>}
+        <p>{errors.email?.message}</p>
         <IonText> Password</IonText>
         <IonInput
           type="password"
           placeholder="Password"
-          {...register("password", { required: true })}
+          {...register("password", {
+            required: "Password is required",
+            minLength: {
+              value: 6,
+              message: "Password must have at least 6 characters",
+            },
+          })}
           // onIonChange={(e: any) => setPassword(e.target.value)}
         />
-        {errors.password && <p>Password is required</p>}
+        <p>{errors.password?.message}</p>
         <IonButton className="btn" onClick={handleSubmit(onSubmit)}>
           Login
         </IonButton>

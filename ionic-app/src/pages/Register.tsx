@@ -12,6 +12,8 @@ import { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { regis } from "../config";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { sendPasswordResetEmail } from "@firebase/auth";
 
 type Inputs = {
   email: string;
@@ -50,24 +52,39 @@ const Register: React.FC = () => {
       <IonContent className="ion-padding">
         <IonInput
           placeholder="Email"
-          {...register("email", { required: true })}
+          {...register("email", {
+            required: "Email must be filled out",
+            pattern: {
+              value: /^\S+@\S+$/i,
+              message: "This is not a valid email",
+            },
+          })}
           //onIonChange={(e: any) => setEmail(e.target.value)}
         />
-        {errors.email && <p>Email must be filled out</p>}
+        <p>{errors.email?.message}</p>
         <IonInput
           type="password"
           placeholder="Password"
-          {...register("password", { required: true })}
+          {...register("password", {
+            required: "Password must be filled out",
+            minLength: {
+              value: 6,
+              message: "Password must have at least 6 characters",
+            },
+          })}
           //onIonChange={(e: any) => setPassword(e.target.value)}
         />
-        {errors.password && <p>Password must be filled out</p>}
+        <p>{errors.password?.message}</p>
         <IonInput
           type="password"
           placeholder="Confirm Password"
-          {...register("confirm", { required: true })}
+          {...register("confirm", {
+            required: "Confirm Password must be filled out",
+            validate: {},
+          })}
           //onIonChange={(e: any) => setConfirm(e.target.value)}
         />
-        {errors.confirm && <p>Confirm Password must be filled out</p>}
+        <p>{errors.confirm?.message}</p>
         <IonButton className="btn" onClick={handleSubmit(onSubmit)}>
           Register
         </IonButton>

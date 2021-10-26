@@ -45,14 +45,14 @@ const Profile: React.FC = () => {
     "https://jsonplaceholder.typicode.com/photos",
     fetcher
   );
-  var result = data
-    ? data.reduce(function (res: any, img: any) {
-        if (img.id < 11) {
-          res.push(img);
-        }
-        return res;
-      }, [])
-    : [];
+  // var result = data
+  //   ? data.reduce(function (res: any, img: any) {
+  //       if (img.id < 11) {
+  //         res.push(img);
+  //       }
+  //       return res;
+  //     }, [])
+  //   : [];
   // console.log(result);
 
   let history = useHistory();
@@ -132,10 +132,10 @@ const Profile: React.FC = () => {
       </IonContent>
       <IonContent className="imageContent">
         <IonList>
-          {result ? (
-            result.map((photo: any) => (
+          {data ? (
+            data.map((photo: any) => (
               <IonItem className="item" key={photo.id}>
-                <IonText>{photo.id}</IonText>
+                {/* <IonText>{photo.id}</IonText> */}
                 <IonImg src={photo.thumbnailUrl} />
               </IonItem>
             ))

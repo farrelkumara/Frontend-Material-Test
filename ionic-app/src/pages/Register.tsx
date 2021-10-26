@@ -13,6 +13,7 @@ import { Link, useHistory } from "react-router-dom";
 import { regis } from "../config";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { sendPasswordResetEmail } from "@firebase/auth";
 
 type Inputs = {
@@ -20,6 +21,21 @@ type Inputs = {
   password: string;
   confirm: string;
 };
+
+const validationSchema = yup.object().shape({
+  email: yup
+    .string()
+    .required("Email must be filled out")
+    .email("This is not a valid email"),
+  password: yup
+    .string()
+    .required("Password must be filled out")
+    .min(6, "Password must be at least 6 characters"),
+  confirm: yup
+    .string()
+    .required("Confirm Password must be filled out")
+    .oneOf([yup.ref("password"), null], "Confirm Password does not match"),
+});
 
 const Register: React.FC = () => {
   // const [email, setEmail] = useState("");
@@ -29,7 +45,9 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    resolver: yupResolver(validationSchema),
+  });
 
   let history = useHistory();
 
@@ -52,36 +70,21 @@ const Register: React.FC = () => {
       <IonContent className="ion-padding">
         <IonInput
           placeholder="Email"
-          {...register("email", {
-            required: "Email must be filled out",
-            pattern: {
-              value: /^\S+@\S+$/i,
-              message: "This is not a valid email",
-            },
-          })}
+          {...register("email")}
           //onIonChange={(e: any) => setEmail(e.target.value)}
         />
         <p>{errors.email?.message}</p>
         <IonInput
           type="password"
           placeholder="Password"
-          {...register("password", {
-            required: "Password must be filled out",
-            minLength: {
-              value: 6,
-              message: "Password must have at least 6 characters",
-            },
-          })}
+          {...register("password")}
           //onIonChange={(e: any) => setPassword(e.target.value)}
         />
         <p>{errors.password?.message}</p>
         <IonInput
           type="password"
           placeholder="Confirm Password"
-          {...register("confirm", {
-            required: "Confirm Password must be filled out",
-            validate: {},
-          })}
+          {...register("confirm")}
           //onIonChange={(e: any) => setConfirm(e.target.value)}
         />
         <p>{errors.confirm?.message}</p>

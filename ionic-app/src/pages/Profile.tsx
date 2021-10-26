@@ -10,12 +10,28 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonThumbnail,
+  IonImg,
 } from "@ionic/react";
 import { useState } from "react";
 import auth from "../config";
 import { updateData } from "../config";
 import { useHistory } from "react-router-dom";
 import { getData } from "../config";
+import useSWR from "swr";
+
+const fetcher = async (
+  input: RequestInfo,
+  init: RequestInit,
+  ...args: any[]
+) => {
+  const res = await fetch(input, init);
+  // console.log(res.json());
+  return res.json();
+};
 
 const Profile: React.FC = () => {
   const [disable, setDisable] = useState(true);
@@ -25,17 +41,31 @@ const Profile: React.FC = () => {
   //   const [user, setUser] = useState({ name: "", birthdate: "" });
   const [nama, setNama] = useState("");
   const [birth, setBirth] = useState("");
+  const { data } = useSWR(
+    "https://jsonplaceholder.typicode.com/photos",
+    fetcher
+  );
+  var result = data
+    ? data.reduce(function (res: any, img: any) {
+        if (img.id < 11) {
+          res.push(img);
+        }
+        return res;
+      }, [])
+    : [];
+  // console.log(result);
+
   let history = useHistory();
   getData(auth.currentUser?.uid).then((data) => {
     setNama(data.name);
     setBirth(data.birthdate);
   });
-  console.log(nama);
+  // console.log(nama);
 
   function updateProfile() {
     setDisable(false);
     setShow(true);
-    console.log(nama);
+    // console.log(nama);
   }
 
   function saveProfile() {
@@ -99,6 +129,20 @@ const Profile: React.FC = () => {
         <IonButton color="danger" onClick={logout}>
           Logout
         </IonButton>
+      </IonContent>
+      <IonContent className="imageContent">
+        <IonList>
+          {result ? (
+            result.map((photo: any) => (
+              <IonItem className="item" key={photo.id}>
+                <IonText>{photo.id}</IonText>
+                <IonImg src={photo.thumbnailUrl} />
+              </IonItem>
+            ))
+          ) : (
+            <IonText>loading...</IonText>
+          )}
+        </IonList>
       </IonContent>
     </IonPage>
   );

@@ -10,18 +10,36 @@ import {
 } from "@ionic/react";
 import { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { register } from "../config";
+import { regis } from "../config";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+type Inputs = {
+  email: string;
+  password: string;
+  confirm: string;
+};
 
 const Register: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [confirm, setConfirm] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
+
   let history = useHistory();
 
-  async function Register() {
-    const res = await register(email, password, confirm);
+  // async function Register() {
+  //   const res = await register(email, password, confirm);
+  //   res ? history.push("/") : alert("error");
+  // }
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const res = await regis(data.email, data.password, data.confirm);
     res ? history.push("/") : alert("error");
-  }
+  };
   return (
     <IonPage>
       <IonHeader>
@@ -32,19 +50,25 @@ const Register: React.FC = () => {
       <IonContent className="ion-padding">
         <IonInput
           placeholder="Email"
-          onIonChange={(e: any) => setEmail(e.target.value)}
+          {...register("email", { required: true })}
+          //onIonChange={(e: any) => setEmail(e.target.value)}
         />
+        {errors.email && <p>Email must be filled out</p>}
         <IonInput
           type="password"
           placeholder="Password"
-          onIonChange={(e: any) => setPassword(e.target.value)}
+          {...register("password", { required: true })}
+          //onIonChange={(e: any) => setPassword(e.target.value)}
         />
+        {errors.password && <p>Password must be filled out</p>}
         <IonInput
           type="password"
           placeholder="Confirm Password"
-          onIonChange={(e: any) => setConfirm(e.target.value)}
+          {...register("confirm", { required: true })}
+          //onIonChange={(e: any) => setConfirm(e.target.value)}
         />
-        <IonButton className="btn" onClick={Register}>
+        {errors.confirm && <p>Confirm Password must be filled out</p>}
+        <IonButton className="btn" onClick={handleSubmit(onSubmit)}>
           Register
         </IonButton>
 

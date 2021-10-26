@@ -11,16 +11,35 @@ import {
 import { useState } from "react";
 import { login } from "../config";
 import { useHistory, Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+type Inputs = {
+  email: string;
+  password: string;
+};
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
+
   let history = useHistory();
 
-  async function Login() {
-    const res = await login(email, password);
+  // async function Login() {
+  //   const res = await login(email, password);
+  //   res ? history.push("/Profile") : alert("error");
+  // }
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const res = await login(data.email, data.password);
     res ? history.push("/Profile") : alert("error");
-  }
+    // console.log(res);
+    // alert(JSON.stringify(data));
+  };
   return (
     <IonPage>
       <IonHeader>
@@ -29,16 +48,22 @@ const Login: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding content">
+        <IonText> Email</IonText>
         <IonInput
           placeholder="Email"
-          onIonChange={(e: any) => setEmail(e.target.value)}
+          {...register("email", { required: true })}
+          // onIonChange={(e: any) => setEmail(e.target.value)}
         />
+        {errors.email && <p>Email is required</p>}
+        <IonText> Password</IonText>
         <IonInput
           type="password"
           placeholder="Password"
-          onIonChange={(e: any) => setPassword(e.target.value)}
+          {...register("password", { required: true })}
+          // onIonChange={(e: any) => setPassword(e.target.value)}
         />
-        <IonButton className="btn" onClick={Login}>
+        {errors.password && <p>Password is required</p>}
+        <IonButton className="btn" onClick={handleSubmit(onSubmit)}>
           Login
         </IonButton>
         <IonText className="register">
